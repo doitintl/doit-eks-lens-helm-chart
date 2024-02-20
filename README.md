@@ -16,9 +16,9 @@ To generate templates:
 
     helm template doit-eks-lens-helm-chart/doit-eks-lens
 
-To install the doit-eks-lens chart:
+To install the doit-eks-lens chart with its own kube-state-metrics deployment:
 
-    helm install doit-eks-lens doit-eks-lens-helm-chart/doit-eks-lens --set region=<EKS-CLUSTER-REGION> \
+    helm upgrade -install doit-eks-lens doit-eks-lens-helm-chart/doit-eks-lens --set region=<EKS-CLUSTER-REGION> \
         --set metricsDeploymentId=<DEPLOYMENT-ID> \
         --set s3_bucket=<S3-BUCKET-NAME> \
         --set s3_prefix=<S3-BUCKET-PREFIX> \
@@ -28,13 +28,38 @@ To install the doit-eks-lens chart:
 
 Example:
 
-    helm install doit-eks-lens doit-eks-lens-helm-chart/doit-eks-lens --set region=us-east-1 \
+    helm upgrade -install doit-eks-lens doit-eks-lens-helm-chart/doit-eks-lens --set region=us-east-1 \
         --set metricsDeploymentId=2Dw7oXwSkgjwjsXGcSMr \
         --set s3_bucket=doitintl-eks-metrics-410386763839-us-east-1 \
         --set s3_prefix=eks-metrics/410386763839/us-east-1/public \
         --set role_arn=arn:aws:iam::410386763839:role/doit_eks_us-east-1_public \
         --namespace doit-eks-metrics \
         --create-namespace
+
+To install the doit-eks-lens chart without kube-state-metrics deployment and use an existing kube-state-metrics in the cluster:
+
+    helm upgrade -install doit-eks-lens doit-eks-lens-helm-chart/doit-eks-lens --set region=<EKS-CLUSTER-REGION> \
+        --set metricsDeploymentId=<DEPLOYMENT-ID> \
+        --set s3_bucket=<S3-BUCKET-NAME> \
+        --set s3_prefix=<S3-BUCKET-PREFIX> \
+        --set role_arn=<IAM-ROLE-ARN> \
+        --set kubeStateMetrics.install=false \
+        --set collector.otelcol.kubeStateMetrics.endpoint=<KUBE-STATE-METRICS-SERVICE-NAME:PORT> \
+        --namespace doit-eks-metrics \
+        --create-namespace
+
+Example:
+
+helm upgrade -install doit-eks-lens doit-eks-lens-helm-chart/doit-eks-lens --set region=us-west-2 \
+        --set metricsDeploymentId=2Dw7oXwSkgjwjsXGcSMr  \
+        --set s3_bucket=doitintl-eks-metrics-317630533282-us-west-2   \
+        --set s3_prefix=eks-metrics/317630533282/us-west-2/wonderful-sheepdog-1708421720  \
+        --set role_arn=arn:aws:iam::317630533282:role/doit_eks_us-west-2_wonderful-sheepdog-1708421720 \
+        --set kubeStateMetrics.install=false \
+        --set collector.otelcol.kubeStateMetrics.endpoint="kube-state-metrics.kube-system:8080" \
+        --namespace doit-eks-metrics \
+        --create-namespace
+
 
 To uninstall the chart:
 
