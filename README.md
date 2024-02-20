@@ -50,15 +50,15 @@ To install the doit-eks-lens chart without kube-state-metrics deployment and use
 
 Example:
 
-helm upgrade -install doit-eks-lens doit-eks-lens-helm-chart/doit-eks-lens --set region=us-west-2 \
-        --set metricsDeploymentId=2Dw7oXwSkgjwjsXGcSMr  \
-        --set s3_bucket=doitintl-eks-metrics-317630533282-us-west-2   \
-        --set s3_prefix=eks-metrics/317630533282/us-west-2/wonderful-sheepdog-1708421720  \
-        --set role_arn=arn:aws:iam::317630533282:role/doit_eks_us-west-2_wonderful-sheepdog-1708421720 \
-        --set kubeStateMetrics.install=false \
-        --set collector.otelcol.kubeStateMetrics.endpoint="kube-state-metrics.kube-system:8080" \
-        --namespace doit-eks-metrics \
-        --create-namespace
+    helm upgrade -install doit-eks-lens doit-eks-lens-helm-chart/doit-eks-lens --set region=us-west-2 \
+            --set metricsDeploymentId=2Dw7oXwSkgjwjsXGcSMr  \
+            --set s3_bucket=doitintl-eks-metrics-317630533282-us-west-2   \
+            --set s3_prefix=eks-metrics/317630533282/us-west-2/wonderful-sheepdog-1708421720  \
+            --set role_arn=arn:aws:iam::317630533282:role/doit_eks_us-west-2_wonderful-sheepdog-1708421720 \
+            --set kubeStateMetrics.install=false \
+            --set collector.otelcol.kubeStateMetrics.endpoint="kube-state-metrics.kube-system:8080" \
+            --namespace doit-eks-metrics \
+            --create-namespace
 
 
 To uninstall the chart:
