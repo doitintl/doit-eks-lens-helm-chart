@@ -147,7 +147,11 @@ data:
     receivers:
       prometheus_simple:
           collection_interval: 60s
+          {{- if .Values.kubeStateMetrics.install }}
           endpoint: 'kube-state-metrics:8080'
+          {{ else }}
+          endpoint: {{ squote .Values.collector.otelcol.kubeStateMetrics.endpoint }}
+          {{- end }}
           metrics_path: '/metrics'
           tls:
             insecure: true
@@ -328,8 +332,6 @@ data:
           processors: [resource/1, filter/1, attributes/1, metricstransform/add, memory_limiter, batch]
           exporters: [awss3] # logging,
 ---
-
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -381,7 +383,7 @@ spec:
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: "cluster.local"
         image: {{ .Values.collector.otelcol.image.repository }}:{{ .Values.collector.otelcol.image.tag }}
-        imagePullPolicy: {{ .Values.collector.otelcol.imagePullPolicy }}
+        imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 3
           httpGet:

@@ -1,3 +1,4 @@
+{{- if .Values.kubeStateMetrics.install }}
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -187,8 +188,8 @@ spec:
               fieldPath: spec.nodeName
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: "cluster.local"
-        image: {{ .Values.kubeStateMetrics.kubeStateMetrics.image.repository }}:{{ .Values.kubeStateMetrics.kubeStateMetrics.image.tag }}
-        imagePullPolicy: {{ .Values.kubeStateMetrics.kubeStateMetrics.imagePullPolicy }}
+        image: {{ .Values.kubeStateMetrics.image.repository }}:{{ .Values.kubeStateMetrics.image.tag }}
+        imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 3
           httpGet:
@@ -227,3 +228,4 @@ spec:
   ports:
   - name: http-metrics
     port: 8080
+{{ end }}
