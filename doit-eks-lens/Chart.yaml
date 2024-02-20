@@ -1,0 +1,6 @@
+apiVersion: v2
+name: doit-eks-lens
+description: A Helm chart for DoiT EKS lens
+type: application
+version: 1.0.0
+appVersion: "1.0.0"

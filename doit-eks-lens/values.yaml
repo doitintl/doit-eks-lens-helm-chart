@@ -1,0 +1,23 @@
+collector:
+  otelcol:
+    image:
+      repository: otel/opentelemetry-collector-contrib
+      tag: 0.83.0
+    imagePullPolicy: IfNotPresent
+  replicas: 1
+doitKubeStateMetrics:
+  serviceAccount:
+    annotations: {}
+kubeStateMetrics:
+  kubeStateMetrics:
+    image:
+      repository: registry.k8s.io/kube-state-metrics/kube-state-metrics
+      tag: v2.9.2
+    imagePullPolicy: IfNotPresent
+  replicas: 1
+kubernetesClusterDomain: cluster.local
+metricsDeploymentId: # 2Dw7oXwSkgjwjsXGcSMr
+s3_bucket: #'doitintl-eks-metrics-410386763839-us-east-1'
+s3_prefix: #'eks-metrics/410386763839/us-east-1/public'
+role_arn: #arn:aws:iam::410386763839:role/doit_eks_us-east-1_public
+region: # us-east-1

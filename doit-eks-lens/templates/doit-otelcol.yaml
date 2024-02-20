@@ -1,0 +1,414 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: doit-collector
+  labels:
+    app: doit-collector
+  {{- include "doit-eks-lens.labels" . | nindent 4 }}
+  annotations:
+    eks.amazonaws.com/role-arn: {{ quote .Values.role_arn }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: doit-otel
+  labels:
+    app: doit-collector
+  {{- include "doit-eks-lens.labels" . | nindent 4 }}
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - events
+  - namespaces
+  - namespaces/status
+  - nodes
+  - nodes/spec
+  - nodes/stats
+  - nodes/proxy
+  - pods
+  - pods/status
+  - replicationcontrollers
+  - replicationcontrollers/status
+  - resourcequotas
+  - services
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - daemonsets
+  - deployments
+  - replicasets
+  - statefulsets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - extensions
+  resources:
+  - daemonsets
+  - deployments
+  - replicasets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  - cronjobs
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - autoscaling
+  resources:
+  - horizontalpodautoscalers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - create
+  - get
+  - list
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - nodes
+  - endpoints
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - nodes/proxy
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  resources:
+  - nodes/stats
+  - configmaps
+  - events
+  verbs:
+  - create
+  - get
+- apiGroups:
+  - ""
+  resourceNames:
+  - otel-container-insight-clusterleader
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: doit-otel
+  labels:
+    app: doit-otel
+  {{- include "doit-eks-lens.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: 'doit-otel'
+subjects:
+- kind: ServiceAccount
+  name: 'doit-collector'
+  namespace: '{{ .Release.Namespace }}'
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: doit-collector-config
+  labels:
+    doit.com/metrics-deployment-id: {{ quote .Values.metricsDeploymentId }}
+    k8s-app: opentelemetry-collector
+  {{- include "doit-eks-lens.labels" . | nindent 4 }}
+data:
+  collector.yaml: |-
+    receivers:
+      prometheus_simple:
+          collection_interval: 60s
+          endpoint: 'kube-state-metrics:8080'
+          metrics_path: '/metrics'
+          tls:
+            insecure: true
+            insecure_skip_verify: true
+    processors:
+      batch:
+        send_batch_max_size: 1000
+        timeout: 30s
+        send_batch_size : 800
+      memory_limiter:
+         check_interval: 1s
+         limit_percentage: 70
+         spike_limit_percentage: 30
+      resource/1:
+          attributes:
+            - key: service.name
+              action: delete
+            - key: net.host.name
+              action: delete
+            - key: service.instance.id
+              action: delete
+            - key: net.host.port
+              action: delete
+            - key: http.scheme
+              action: delete
+      attributes/1:
+        actions:
+          - key: container_runtime_version
+            action: delete
+          - key: host_ip
+            action: delete
+          - key: host_network
+            action: delete
+          - key: pod_ip
+            action: delete
+          - key: internal_ip
+            action: delete
+          - key: kernel_version
+            action: delete
+          - key: kubelet_version
+            action: delete
+          - key: kubeproxy_version
+            action: delete
+          - key: os_image
+            action: delete
+          - key: priority_class
+            action: delete
+          - key: label_pod_template_hash
+            action: delete
+          - key: label_controller_revision_hash
+            action: delete
+          - key: label_pod_template_generation
+            action: delete
+          - key: label_beta_kubernetes_io_arch
+            action: delete
+          - key: label_beta_kubernetes_io_os
+            action: delete
+          - key: label_eks_amazonaws_com_nodegroup_image
+            action: delete
+          - key: label_kubernetes_io_arch
+            action: delete
+          - key: label_failure_domain_beta_kubernetes_io_region
+            action: delete
+          - key: label_failure_domain_beta_kubernetes_io_zone
+            action: delete
+          - key: label_kubernetes_io_os
+            action: delete
+          - key: label_kubernetes_io_hostnamea
+            action: delete
+      metricstransform/add:
+        transforms:
+          - include: .*
+            match_type: regexp
+            action: update
+            operations:
+              - action: add_label
+                new_label: doit.com/metrics-deployment-id
+                new_value: {{ quote .Values.metricsDeploymentId }}
+          - include: kube_pod_init_container_resource_requests
+            action: update
+            operations:
+              - action: add_label
+                new_label: metrics_name
+                new_value: init_resource_requests
+          - include: kube_pod_init_container_resource_limits
+            action: update
+            operations:
+              - action: add_label
+                new_label: metrics_name
+                new_value: init_resource_limits
+          - include: kube_pod_init_container_status_running
+            action: update
+            operations:
+              - action: add_label
+                new_label: metrics_name
+                new_value: init_container_running
+          - include: kube_pod_info
+            action: update
+            operations:
+              - action: add_label
+                new_label: metrics_name
+                new_value: pod_info
+          - include: kube_pod_container_status_running
+            action: update
+            operations:
+              - action: add_label
+                new_label: metrics_name
+                new_value: container_running
+          - include: kube_pod_container_resource_requests
+            action: update
+            operations:
+              - action: add_label
+                new_label: metrics_name
+                new_value: resource_requests
+          - include: kube_pod_container_resource_limits
+            action: update
+            operations:
+              - action: add_label
+                new_label: metrics_name
+                new_value: resource_limits
+          - include: kube_pod_labels
+            action: update
+            operations:
+              - action: add_label
+                new_label: metrics_name
+                new_value: pod_labels
+          - include: kube_node_info
+            action: update
+            operations:
+              - action: add_label
+                new_label: metrics_name
+                new_value: node_info
+          - include: kube_node_labels
+            action: update
+            operations:
+              - action: add_label
+                new_label: metrics_name
+                new_value: node_labels
+      filter/1:
+        metrics:
+          include:
+            match_type: strict
+            metric_names:
+              - kube_pod_init_container_resource_limits
+              - kube_pod_init_container_resource_requests
+              - kube_pod_init_container_status_running
+              - kube_pod_info
+              - kube_pod_labels
+              - kube_pod_container_status_running
+              - kube_pod_container_resource_limits
+              - kube_pod_container_resource_requests
+              - kube_node_info
+              - kube_node_labels
+    exporters:
+      # logging:
+      #   loglevel: debug
+      awss3:
+        s3uploader:
+          region: {{ quote .Values.region }}
+          s3_bucket: {{ quote .Values.s3_bucket }}
+          s3_prefix: {{ quote .Values.s3_prefix }}
+          file_prefix: ${K8S_NODE_NAME}
+          s3_partition: 'minute'
+    extensions:
+      memory_ballast:
+        size_in_percentage: 20
+      health_check: {}
+    service:
+      telemetry:
+        # logs:
+        #   level: DEBUG
+        metrics:
+          address: ":8888"
+      extensions: [memory_ballast, health_check]
+      pipelines:
+        metrics:
+          receivers: [prometheus_simple]
+          processors: [resource/1, filter/1, attributes/1, metricstransform/add, memory_limiter, batch]
+          exporters: [awss3] # logging,
+---
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: collector
+  labels:
+    doit.com/metrics-deployment-id: {{ quote .Values.metricsDeploymentId }}
+    k8s-app: opentelemetry-collector
+  {{- include "doit-eks-lens.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.collector.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: doit-collector
+    {{- include "doit-eks-lens.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: metrics
+        app.kubernetes.io/name: doit-collector
+        doit.com/metrics-deployment-id: {{ quote .Values.metricsDeploymentId }}
+      {{- include "doit-eks-lens.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - args:
+        - --config=/conf/collector.yaml
+        env:
+        - name: K8S_NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: HOST_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: HOST_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: K8S_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: "cluster.local"
+        image: {{ .Values.collector.otelcol.image.repository }}:{{ .Values.collector.otelcol.image.tag }}
+        imagePullPolicy: {{ .Values.collector.otelcol.imagePullPolicy }}
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: 13133
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: otelcol
+        ports:
+        - containerPort: 8888
+          hostPort: 8888
+          name: metrics
+          protocol: TCP
+        resources: {}
+        volumeMounts:
+        - mountPath: /conf
+          name: doit-collector-config
+          readOnly: true
+      restartPolicy: Always
+      serviceAccount: doit-collector
+      volumes:
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: collector.yaml
+            path: collector.yaml
+          name: doit-collector-config
+        name: doit-collector-config
