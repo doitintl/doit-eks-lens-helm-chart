@@ -12,8 +12,8 @@ collector:
       tag: 0.83.0
     kubeStateMetrics:
       endpoint: "kube-state-metrics:8080"
-metricsDeploymentId: # 2Dw7oXwSkgjwjsXGcSMr
-s3_bucket: #'doitintl-eks-metrics-410386763839-us-east-1'
-s3_prefix: #'eks-metrics/410386763839/us-east-1/public'
-role_arn: #arn:aws:iam::410386763839:role/doit_eks_us-east-1_public
-region: # us-east-1
+metricsDeploymentId: xxxxxxxxx
+s3_bucket: 'doitintl-eks-metrics-xxxxxxxx-us-east-1'
+s3_prefix: 'eks-metrics/xxxxxxxx/us-east-1/public'
+role_arn: arn:aws:iam::xxxxxxxx:role/doit_eks_us-east-1_public
+region: us-east-1
