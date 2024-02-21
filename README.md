@@ -60,6 +60,28 @@ Example:
             --namespace doit-eks-metrics \
             --create-namespace
 
+To install the doit-eks-lens chart in a self-managed EC2 based kubernetes cluster:
+
+    helm upgrade -install doit-eks-lens doit-eks-lens/doit-eks-lens --set region=<EKS-CLUSTER-REGION> \
+        --set metricsDeploymentId=<DEPLOYMENT-ID> \
+        --set s3_bucket=<S3-BUCKET-NAME> \
+        --set s3_prefix=<S3-BUCKET-PREFIX> \
+        --set role_arn=<IAM-ROLE-ARN> \
+        --set k8s_platform=ec2 \
+        --namespace doit-eks-metrics \
+        --create-namespace
+
+Example:
+
+    helm upgrade -install doit-eks-lens doit-eks-lens/doit-eks-lens --set region=us-west-2 \
+            --set metricsDeploymentId=2Dw7oXwSkgjwjsXGcSMr  \
+            --set s3_bucket=doitintl-eks-metrics-317630533282-us-west-2   \
+            --set s3_prefix=eks-metrics/317630533282/us-west-2/wonderful-sheepdog-1708421720  \
+            --set role_arn=arn:aws:iam::317630533282:role/doit_eks_us-west-2_wonderful-sheepdog-1708421720 \
+            --set k8s_platform=ec2 \
+            --namespace doit-eks-metrics \
+            --create-namespace
+
 
 To uninstall the chart:
 
