@@ -8,7 +8,7 @@ Repository contains the helm chart templates to install the components required 
 
 Once Helm has been set up correctly, add the repo as follows:
 
-  helm repo add doit-eks-lens https://doitintl.github.io/doit-eks-lens-helm-chart/
+    helm repo add doit-eks-lens https://doitintl.github.io/doit-eks-lens-helm-chart/
 
 If you had already added this repo earlier, run `helm repo update` to retrieve the latest versions of the packages.You can then run `helm search repo doit-eks-lens` to see the charts.
 
