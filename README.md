@@ -1,4 +1,4 @@
-# doit-eks-lens-helm-chart
+# doit-eks-lens
 
 Repository contains the helm chart templates to install the components required for [EKS Lens](#https://help.doit.com/docs/dashboards/eks-lens).
 
@@ -10,7 +10,7 @@ Once Helm has been set up correctly, add the repo as follows:
 
     helm repo add doit-eks-lens https://doitintl.github.io/doit-eks-lens-helm-chart/
 
-If you had already added this repo earlier, run `helm repo update` to retrieve the latest versions of the packages.You can then run `helm search repo doit-eks-lens` to see the charts.
+If you had already added this repo earlier, run `helm repo update` to retrieve the latest versions of the packages. You can then run `helm search repo doit-eks-lens` to see the charts.
 
 To generate templates:
 
@@ -57,6 +57,27 @@ Example:
             --set role_arn=arn:aws:iam::317630533282:role/doit_eks_us-west-2_wonderful-sheepdog-1708421720 \
             --set kubeStateMetrics.install=false \
             --set collector.otelcol.kubeStateMetrics.endpoint="kube-state-metrics.kube-system:8080" \
+            --namespace doit-eks-metrics \
+            --create-namespace
+
+To install the doit-eks-lens chart in a self-managed EC2 based kubernetes cluster:
+Ensure the required kubernetes secrets (aws-access-key-id,aws-secret-access-key) are created before installing the helm chart.
+
+    helm upgrade -install doit-eks-lens doit-eks-lens/doit-eks-lens --set region=<EKS-CLUSTER-REGION> \
+        --set metricsDeploymentId=<DEPLOYMENT-ID> \
+        --set s3_bucket=<S3-BUCKET-NAME> \
+        --set s3_prefix=<S3-BUCKET-PREFIX> \
+        --set k8s_platform=ec2 \
+        --namespace doit-eks-metrics \
+        --create-namespace
+
+Example:
+
+    helm upgrade -install doit-eks-lens . --set region=us-west-2 \
+            --set metricsDeploymentId=2Dw7oXwSkgjwjsXGcSMr  \
+            --set s3_bucket=doitintl-eks-metrics-317630533282-us-west-2   \
+            --set s3_prefix=eks-metrics/317630533282/us-west-2/wonderful-sheepdog-1708421720  \
+            --set k8s_platform=ec2 \
             --namespace doit-eks-metrics \
             --create-namespace
 
