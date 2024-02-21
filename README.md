@@ -1,5 +1,3 @@
-# doit-eks-lens
-
 Repository contains the helm chart templates to install the components required for [EKS Lens](#https://help.doit.com/docs/dashboards/eks-lens).
 
 ## Usage
