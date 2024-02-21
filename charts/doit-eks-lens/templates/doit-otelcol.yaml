@@ -6,8 +6,10 @@ metadata:
   labels:
     app: doit-collector
   {{- include "doit-eks-lens.labels" . | nindent 4 }}
+  {{- if eq .Values.k8s_platform "eks" }}
   annotations:
     eks.amazonaws.com/role-arn: {{ quote .Values.role_arn }}
+  {{- end }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -358,6 +360,18 @@ spec:
       - args:
         - --config=/conf/collector.yaml
         env:
+        {{- if eq .Values.k8s_platform "ec2" }}
+        - name: "AWS_ACCESS_KEY_ID"
+          valueFrom:
+            secretKeyRef:
+              name: "aws-access-key-id"
+              key: "AWS_ACCESS_KEY_ID"
+        - name: "AWS_SECRET_ACCESS_KEY"
+          valueFrom:
+            secretKeyRef:
+              name: "aws-secret-access-key"
+              key: "AWS_SECRET_ACCESS_KEY"
+        {{- end }}
         - name: K8S_NODE_NAME
           valueFrom:
             fieldRef:
