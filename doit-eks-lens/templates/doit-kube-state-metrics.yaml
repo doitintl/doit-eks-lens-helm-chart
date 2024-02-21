@@ -1,0 +1,231 @@
+{{- if .Values.kubeStateMetrics.install }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: doit-kube-state-metrics
+  labels:
+  {{- include "doit-eks-lens.labels" . | nindent 4 }}
+  annotations:
+    eks.amazonaws.com/role-arn: {{ quote .Values.role_arn }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: doit-kube-state-metrics
+  labels:
+    app: doit-kube-state-metrics
+  {{- include "doit-eks-lens.labels" . | nindent 4 }}
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  - secrets
+  - nodes
+  - pods
+  - services
+  - serviceaccounts
+  - resourcequotas
+  - replicationcontrollers
+  - limitranges
+  - persistentvolumeclaims
+  - persistentvolumes
+  - namespaces
+  - endpoints
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - statefulsets
+  - daemonsets
+  - deployments
+  - replicasets
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - batch
+  resources:
+  - cronjobs
+  - jobs
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - autoscaling
+  resources:
+  - horizontalpodautoscalers
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - authentication.k8s.io
+  resources:
+  - tokenreviews
+  verbs:
+  - create
+- apiGroups:
+  - authorization.k8s.io
+  resources:
+  - subjectaccessreviews
+  verbs:
+  - create
+- apiGroups:
+  - policy
+  resources:
+  - poddisruptionbudgets
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - certificates.k8s.io
+  resources:
+  - certificatesigningrequests
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - discovery.k8s.io
+  resources:
+  - endpointslices
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - storage.k8s.io
+  resources:
+  - storageclasses
+  - volumeattachments
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - mutatingwebhookconfigurations
+  - validatingwebhookconfigurations
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - networkpolicies
+  - ingressclasses
+  - ingresses
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterrolebindings
+  - clusterroles
+  - rolebindings
+  - roles
+  verbs:
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: doit-kube-state-metrics
+  labels:
+    app: doit-kube-state-metrics
+  {{- include "doit-eks-lens.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: 'doit-kube-state-metrics'
+subjects:
+- kind: ServiceAccount
+  name: 'doit-kube-state-metrics'
+  namespace: '{{ .Release.Namespace }}'
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kube-state-metrics
+  labels:
+    app.kubernetes.io/component: exporter
+    k8s-app: kube-state-metrics
+  {{- include "doit-eks-lens.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.kubeStateMetrics.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kube-state-metrics
+    {{- include "doit-eks-lens.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: exporter
+        app.kubernetes.io/name: kube-state-metrics
+      {{- include "doit-eks-lens.selectorLabels" . | nindent 8 }}
+    spec:
+      automountServiceAccountToken: true
+      containers:
+      - args:
+        - --port=8080
+        - --resources=cronjobs,daemonsets,deployments,jobs,nodes,pods,replicasets,replicationcontrollers,resourcequotas,statefulsets
+        - --metric-labels-allowlist=pods=[*],nodes=[*]
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: "cluster.local"
+        image: {{ .Values.kubeStateMetrics.image.repository }}:{{ .Values.kubeStateMetrics.image.tag }}
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        name: kube-state-metrics
+        ports:
+        - containerPort: 80
+          name: http-metrics
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: 8080
+            scheme: HTTP
+        resources: {}
+      restartPolicy: Always
+      serviceAccount: doit-kube-state-metrics
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kube-state-metrics
+  labels:
+  {{- include "doit-eks-lens.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: kube-state-metrics
+  {{- include "doit-eks-lens.selectorLabels" . | nindent 4 }}
+  ports:
+  - name: http-metrics
+    port: 8080
+{{ end }}

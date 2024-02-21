@@ -1,0 +1,19 @@
+kubeStateMetrics:
+  install: true
+  replicas: 1
+  image:
+    repository: registry.k8s.io/kube-state-metrics/kube-state-metrics
+    tag: v2.9.2
+collector:
+  otelcol:
+    replicas: 1
+    image:
+      repository: otel/opentelemetry-collector-contrib
+      tag: 0.83.0
+    kubeStateMetrics:
+      endpoint: "kube-state-metrics:8080"
+metricsDeploymentId: xxxxxxxxx
+s3_bucket: 'doitintl-eks-metrics-xxxxxxxx-us-east-1'
+s3_prefix: 'eks-metrics/xxxxxxxx/us-east-1/public'
+role_arn: arn:aws:iam::xxxxxxxx:role/doit_eks_us-east-1_public
+region: us-east-1
