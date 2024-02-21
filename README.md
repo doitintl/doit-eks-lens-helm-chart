@@ -14,11 +14,11 @@ If you had already added this repo earlier, run `helm repo update` to retrieve t
 
 To generate templates:
 
-    helm template doit-eks-lens-helm-chart/doit-eks-lens
+    helm template doit-eks-lens/doit-eks-lens
 
 To install the doit-eks-lens chart with its own kube-state-metrics deployment:
 
-    helm upgrade -install doit-eks-lens doit-eks-lens-helm-chart/doit-eks-lens --set region=<EKS-CLUSTER-REGION> \
+    helm upgrade -install doit-eks-lens doit-eks-lens/doit-eks-lens --set region=<EKS-CLUSTER-REGION> \
         --set metricsDeploymentId=<DEPLOYMENT-ID> \
         --set s3_bucket=<S3-BUCKET-NAME> \
         --set s3_prefix=<S3-BUCKET-PREFIX> \
@@ -28,7 +28,7 @@ To install the doit-eks-lens chart with its own kube-state-metrics deployment:
 
 Example:
 
-    helm upgrade -install doit-eks-lens doit-eks-lens-helm-chart/doit-eks-lens --set region=us-east-1 \
+    helm upgrade -install doit-eks-lens doit-eks-lens/doit-eks-lens --set region=us-east-1 \
         --set metricsDeploymentId=2Dw7oXwSkgjwjsXGcSMr \
         --set s3_bucket=doitintl-eks-metrics-410386763839-us-east-1 \
         --set s3_prefix=eks-metrics/410386763839/us-east-1/public \
@@ -38,7 +38,7 @@ Example:
 
 To install the doit-eks-lens chart without kube-state-metrics deployment and use an existing kube-state-metrics in the cluster:
 
-    helm upgrade -install doit-eks-lens doit-eks-lens-helm-chart/doit-eks-lens --set region=<EKS-CLUSTER-REGION> \
+    helm upgrade -install doit-eks-lens doit-eks-lens/doit-eks-lens --set region=<EKS-CLUSTER-REGION> \
         --set metricsDeploymentId=<DEPLOYMENT-ID> \
         --set s3_bucket=<S3-BUCKET-NAME> \
         --set s3_prefix=<S3-BUCKET-PREFIX> \
@@ -50,7 +50,7 @@ To install the doit-eks-lens chart without kube-state-metrics deployment and use
 
 Example:
 
-    helm upgrade -install doit-eks-lens doit-eks-lens-helm-chart/doit-eks-lens --set region=us-west-2 \
+    helm upgrade -install doit-eks-lens doit-eks-lens/doit-eks-lens --set region=us-west-2 \
             --set metricsDeploymentId=2Dw7oXwSkgjwjsXGcSMr  \
             --set s3_bucket=doitintl-eks-metrics-317630533282-us-west-2   \
             --set s3_prefix=eks-metrics/317630533282/us-west-2/wonderful-sheepdog-1708421720  \
