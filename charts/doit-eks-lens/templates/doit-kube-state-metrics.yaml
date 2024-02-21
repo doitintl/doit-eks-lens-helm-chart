@@ -21,7 +21,6 @@ rules:
   - ""
   resources:
   - configmaps
-  - secrets
   - nodes
   - pods
   - services
