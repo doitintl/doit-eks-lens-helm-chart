@@ -408,11 +408,6 @@ spec:
           successThreshold: 1
           timeoutSeconds: 1
         name: otelcol
-        ports:
-        - containerPort: 8888
-          hostPort: 8888
-          name: metrics
-          protocol: TCP
         resources: {}
         volumeMounts:
         - mountPath: /conf
