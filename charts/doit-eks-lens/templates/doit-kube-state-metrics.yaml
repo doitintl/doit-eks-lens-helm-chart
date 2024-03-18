@@ -212,6 +212,10 @@ spec:
         resources: {}
       restartPolicy: Always
       serviceAccount: doit-kube-state-metrics
+      {{- if .Values.kubeStateMetrics.tolerations }}
+      tolerations:
+{{ toYaml .Values.kubeStateMetrics.tolerations | indent 8 }}
+      {{- end }}
 ---
 apiVersion: v1
 kind: Service

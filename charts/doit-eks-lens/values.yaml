@@ -6,6 +6,8 @@ kubeStateMetrics:
   image:
     repository: registry.k8s.io/kube-state-metrics/kube-state-metrics
     tag: v2.9.2
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  tolerations: []
 
 collector:
   otelcol:
@@ -15,6 +17,8 @@ collector:
       tag: 0.83.0
     kubeStateMetrics:
       endpoint: "kube-state-metrics:8080"
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  tolerations: []
 
 metricsDeploymentId: xxxxxxxxx
 s3_bucket: 'doitintl-eks-metrics-xxxxxxxx-us-east-1'
