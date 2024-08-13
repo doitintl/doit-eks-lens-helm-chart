@@ -60,6 +60,9 @@ Example:
             --namespace doit-eks-metrics \
             --create-namespace
 
+> Make sure you've added these [arguments](https://github.com/doitintl/doit-eks-lens-helm-chart/blob/main/charts/doit-eks-lens/templates/doit-kube-state-metrics.yaml#L180) to your existing `kube-state-metrics` installation.
+
+
 To install the doit-eks-lens chart in a self-managed EC2 based kubernetes cluster:
 Ensure the required kubernetes secrets (aws-access-key-id,aws-secret-access-key) are created before installing the helm chart.
 
