@@ -423,3 +423,7 @@ spec:
             path: collector.yaml
           name: doit-collector-config
         name: doit-collector-config
+      {{- if .Values.collector.tolerations }}
+      tolerations:
+{{ toYaml .Values.collector.tolerations | indent 8 }}
+      {{- end }}
