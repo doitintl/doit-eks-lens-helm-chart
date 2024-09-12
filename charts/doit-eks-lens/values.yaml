@@ -19,9 +19,16 @@ collector:
       endpoint: "kube-state-metrics:8080"
   ## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
   tolerations: []
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+  resources: {}
+  ## Ref: https://github.com/open-telemetry/opentelemetry-collector/blob/main/processor/memorylimiterprocessor/README.md
+  memory_limiter:
+    check_interval: 1s
+    limit_percentage: 70
+    spike_limit_percentage: 30
 
 metricsDeploymentId: xxxxxxxxx
-s3_bucket: 'doitintl-eks-metrics-xxxxxxxx-us-east-1'
-s3_prefix: 'eks-metrics/xxxxxxxx/us-east-1/public'
+s3_bucket: "doitintl-eks-metrics-xxxxxxxx-us-east-1"
+s3_prefix: "eks-metrics/xxxxxxxx/us-east-1/public"
 role_arn: arn:aws:iam::xxxxxxxx:role/doit_eks_us-east-1_public
 region: us-east-1

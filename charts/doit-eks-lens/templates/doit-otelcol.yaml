@@ -164,9 +164,7 @@ data:
         timeout: 30s
         send_batch_size : 800
       memory_limiter:
-         check_interval: 1s
-         limit_percentage: 70
-         spike_limit_percentage: 30
+{{ toYaml .Values.collector.otelcol.memory_limiter | nindent 8 }}
       resource/1:
           attributes:
             - key: service.name
@@ -408,7 +406,8 @@ spec:
           successThreshold: 1
           timeoutSeconds: 1
         name: otelcol
-        resources: {}
+        resources:
+{{ toYaml .Values.collector.otelcol.resources | nindent 10 }}
         volumeMounts:
         - mountPath: /conf
           name: doit-collector-config
