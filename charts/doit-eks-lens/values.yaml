@@ -26,6 +26,9 @@ collector:
     check_interval: 1s
     limit_percentage: 70
     spike_limit_percentage: 30
+  env:
+  # - name: "GOMEMLIMIT"
+  #   value: "2750MiB"
 
 metricsDeploymentId: xxxxxxxxx
 s3_bucket: "doitintl-eks-metrics-xxxxxxxx-us-east-1"
