@@ -394,6 +394,10 @@ spec:
               fieldPath: metadata.namespace
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: "cluster.local"
+        {{- range .Values.collector.otelcol.env }}
+        - name: {{ .name }}
+          value: {{ .value }}
+        {{- end }} 
         image: {{ .Values.collector.otelcol.image.repository }}:{{ .Values.collector.otelcol.image.tag }}
         imagePullPolicy: IfNotPresent
         livenessProbe:

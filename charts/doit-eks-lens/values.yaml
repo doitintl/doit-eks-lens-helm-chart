@@ -17,6 +17,9 @@ collector:
       tag: 0.83.0
     kubeStateMetrics:
       endpoint: "kube-state-metrics:8080"
+    env:
+  # - name: "GOMEMLIMIT"
+  #   value: "2750MiB"
   ## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
   tolerations: []
   ## Ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
