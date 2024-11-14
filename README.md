@@ -31,7 +31,7 @@ Example:
     helm upgrade -install doit-eks-lens doit-eks-lens/doit-eks-lens --set region=us-east-1 \
         --set metricsDeploymentId=2Dw7oXwSkgjwjsXGcSMr \
         --set s3_bucket=doitintl-eks-metrics-410386763839-us-east-1 \
-        --set s3_prefix=eks-metrics/410386763839/us-east-1/public \
+        --set s3_prefix=eks-metrics/410386763839/us-east-1/my_cluster \
         --set role_arn=arn:aws:iam::410386763839:role/doit_eks_us-east-1_public \
         --namespace doit-eks-metrics \
         --create-namespace
