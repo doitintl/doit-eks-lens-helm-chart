@@ -11,6 +11,11 @@ kubeStateMetrics:
 
 collector:
   otelcol:
+    ## Ref: https://github.com/open-telemetry/opentelemetry-collector/blob/main/processor/memorylimiterprocessor/README.md
+    memory_limiter:
+      check_interval: 1s
+      limit_percentage: 70
+      spike_limit_percentage: 30 
     replicas: 1
     image:
       repository: otel/opentelemetry-collector-contrib
@@ -24,11 +29,7 @@ collector:
   tolerations: []
   ## Ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
   resources: {}
-  ## Ref: https://github.com/open-telemetry/opentelemetry-collector/blob/main/processor/memorylimiterprocessor/README.md
-  memory_limiter:
-    check_interval: 1s
-    limit_percentage: 70
-    spike_limit_percentage: 30
+  
 
 metricsDeploymentId: xxxxxxxxx
 s3_bucket: "doitintl-eks-metrics-xxxxxxxx-us-east-1"
