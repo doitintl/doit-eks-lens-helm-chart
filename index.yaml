@@ -3,6 +3,16 @@ entries:
   doit-eks-lens:
   - apiVersion: v2
     appVersion: 0.0.1
+    created: "2024-11-20T15:24:22.487520141Z"
+    description: A Helm chart for DoiT EKS lens
+    digest: 436cf51db4a82f70b22dba3adb95cc1e69ea17066639e83000f51acd0cba85bb
+    name: doit-eks-lens
+    type: application
+    urls:
+    - https://github.com/doitintl/doit-eks-lens-helm-chart/releases/download/doit-eks-lens-1.0.6/doit-eks-lens-1.0.6.tgz
+    version: 1.0.6
+  - apiVersion: v2
+    appVersion: 0.0.1
     created: "2024-11-20T14:53:43.314742789Z"
     description: A Helm chart for DoiT EKS lens
     digest: a28e71afe8e02b449b31b1ebae4aebff1f783cc3eef0ccbce9d2b850c7cf15f3
@@ -61,4 +71,4 @@ entries:
     urls:
     - https://github.com/doitintl/doit-eks-lens-helm-chart/releases/download/doit-eks-lens-1.0.0/doit-eks-lens-1.0.0.tgz
     version: 1.0.0
-generated: "2024-11-20T14:53:43.314770069Z"
+generated: "2024-11-20T15:24:22.487549195Z"
