@@ -410,8 +410,10 @@ spec:
           successThreshold: 1
           timeoutSeconds: 1
         name: otelcol
+        {{- if .Values.collector.otelcol.resources }}
         resources:
 {{ toYaml .Values.collector.otelcol.resources | nindent 10 }}
+        {{- end }}
         volumeMounts:
         - mountPath: /conf
           name: doit-collector-config
@@ -429,4 +431,8 @@ spec:
       {{- if .Values.collector.tolerations }}
       tolerations:
 {{ toYaml .Values.collector.tolerations | indent 8 }}
+      {{- end }}
+      {{- if .Values.collector.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.collector.nodeSelector | indent 8 }}
       {{- end }}

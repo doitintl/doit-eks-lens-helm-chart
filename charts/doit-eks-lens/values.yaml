@@ -8,6 +8,7 @@ kubeStateMetrics:
     tag: v2.9.2
   ## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
   tolerations: []
+  nodeSelector: {}
 
 collector:
   otelcol:
@@ -22,13 +23,14 @@ collector:
       check_interval: 1s
       limit_percentage: 70
       spike_limit_percentage: 30
+    ## Ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+    resources: {}
     env:
-  # - name: "GOMEMLIMIT"
-  #   value: "2750MiB"
+      # - name: "GOMEMLIMIT"
+      #   value: "2750MiB"
   ## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
   tolerations: []
-  ## Ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
-  resources: {}
+  nodeSelector: {}
 
 metricsDeploymentId: xxxxxxxxx
 s3_bucket: "doitintl-eks-metrics-xxxxxxxx-us-east-1"

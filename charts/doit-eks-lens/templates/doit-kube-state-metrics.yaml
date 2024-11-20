@@ -216,6 +216,10 @@ spec:
       tolerations:
 {{ toYaml .Values.kubeStateMetrics.tolerations | indent 8 }}
       {{- end }}
+      {{- if .Values.kubeStateMetrics.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.kubeStateMetrics.nodeSelector | indent 8 }}
+      {{- end }}
 ---
 apiVersion: v1
 kind: Service
