@@ -149,10 +149,10 @@ data:
     receivers:
       prometheus_simple:
           collection_interval: 60s
-          {{- if .Values.kubeStateMetrics.install }}
+          {{- if .Values.collector.otelcol.install }}
           endpoint: 'kube-state-metrics:8080'
           {{ else }}
-          endpoint: {{ squote .Values.collector.otelcol.kubeStateMetrics.endpoint }}
+          endpoint: {{ squote .Values.collector.otelcol.collector.otelcol.endpoint }}
           {{- end }}
           metrics_path: '/metrics'
           tls:
@@ -398,7 +398,12 @@ spec:
         - name: {{ .name }}
           value: {{ .value }}
         {{- end }} 
-        image: {{ .Values.collector.otelcol.image.repository }}:{{ .Values.collector.otelcol.image.tag }}
+        image: |
+          {{- if kindIs "string" .Values.collector.otelcol.image }}
+          {{ .Values.collector.otelcol.image }}
+          {{- else if kindIs "map" .Values.collector.otelcol.image }}
+          {{ .Values.collector.otelcol.image.repository }}:{{ .Values.collector.otelcol.image.tag }}
+          {{- end }}
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 3
