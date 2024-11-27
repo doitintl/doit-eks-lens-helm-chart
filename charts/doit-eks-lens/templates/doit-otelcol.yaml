@@ -436,3 +436,4 @@ spec:
       nodeSelector:
 {{ toYaml .Values.collector.nodeSelector | indent 8 }}
       {{- end }}
+
