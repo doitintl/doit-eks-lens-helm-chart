@@ -398,7 +398,11 @@ spec:
         - name: {{ .name }}
           value: {{ .value }}
         {{- end }} 
+        {{- if kindIs "string" .Values.collector.otelcol.image }}
+        image: {{ .Values.collector.otelcol.image }}
+        {{- else if kindIs "map" .Values.collector.otelcol.image }}
         image: {{ .Values.collector.otelcol.image.repository }}:{{ .Values.collector.otelcol.image.tag }}
+        {{- end }}
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 3
@@ -436,3 +440,4 @@ spec:
       nodeSelector:
 {{ toYaml .Values.collector.nodeSelector | indent 8 }}
       {{- end }}
+
