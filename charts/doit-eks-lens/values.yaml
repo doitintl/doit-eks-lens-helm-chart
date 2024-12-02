@@ -3,7 +3,7 @@ k8s_platform: eks
 kubeStateMetrics:
   install: true
   replicas: 1
-  image: "registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.9.2"
+  image: registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.9.2
   ## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
   tolerations: []
   nodeSelector: {}
@@ -11,7 +11,7 @@ kubeStateMetrics:
 collector:
   otelcol:
     replicas: 1
-    image: "otel/opentelemetry-collector-contrib:0.83.0"
+    image: otel/opentelemetry-collector-contrib:0.83.0
     kubeStateMetrics:
       endpoint: "kube-state-metrics:8080"
     ## Ref: https://github.com/open-telemetry/opentelemetry-collector/blob/main/processor/memorylimiterprocessor/README.md

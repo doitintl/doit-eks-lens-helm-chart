@@ -187,7 +187,11 @@ spec:
               fieldPath: spec.nodeName
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: "cluster.local"
+        {{- if kindIs "string" .Values.kubeStateMetrics.image }}
         image: {{ .Values.kubeStateMetrics.image }}
+        {{- else if kindIs "map" .Values.kubeStateMetrics.image }}
+        image: {{ .Values.kubeStateMetrics.image.repository }}:{{ .Values.kubeStateMetrics.image.tag }}
+        {{- end }}
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 3
